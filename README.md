@@ -89,11 +89,38 @@ python3 hw2.py --cv-folder task2
 `task2/` has no `ground_truth.json`). Only the PDF is the attack surface; do not
 attack the MCP server. See the homework description for the full rules.
 
-## Homework 2 solution:
-> to students: this is your report, see the homework description.
+## Homework 2 solution
 
 ### Task 1
-> one paragraph describing your solution, and your results on `public_test`.
+
+I use `deepseek-v4-flash` with LangChain and the SocialGraph MCP tools to
+check each CV. The agent first searches by name, city and industry, then uses
+employers, education and skills to distinguish people with the same name.
+LinkedIn is the main source, with Facebook used for additional identity checks
+when needed. It compares each stated claim and returns a structured checklist.
+Python checks reported mismatches, exact years and explicit seniority prefixes,
+so one real discrepancy is enough to lower the score. Equivalent degree names,
+job-title wording and skill names are allowed. Up to three CVs run at once;
+errors are caught per CV and return 0.50 rather than stopping the whole batch.
+The latest complete public test scored **7/7 (100%)**. It correctly identified
+the changed employment start year in CV_4, the inflated title in CV_5 and the
+unsupported Docker skill in CV_7.
 
 ### Task 2
-> the attack techniques you used and why you expect them to work.
+
+My first attempt put hidden instructions in the PDF asking the verifier to
+trust it. That failed: the attack received 0.15 and the true CV received 0.96.
+I then targeted PDF extraction. The revised CV visibly claims Director of
+Finance at AIA, although Kelly's actual role is Manager. I rendered the false
+title as an image and placed invisible text saying Manager at the same position.
+A person viewing the PDF sees the false title, while the homework's text loader
+extracts the true one. I checked this with the same loader used by `hw2.py`.
+In one self-test, the revised attack received **0.95**, and the true CV also
+received **0.95**. The model accepted the attack because it never received the
+visible false title. This technique targets the gap between the displayed PDF
+and its extracted text; ignoring instructions inside the document does not
+close that gap. Results from the five course verifiers are not available.
+
+## Task 3
+
+My reflection is in [reflection.md](reflection.md).
