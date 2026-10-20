@@ -123,6 +123,4 @@ close that gap. Results from the five course verifiers are not available.
 
 ## Task 3
 
-## Task 3
-
 My reflection is in [reflection.pdf](reflection.pdf).
